@@ -7,7 +7,7 @@ import {
   CarouselItem,
   CarouselNext,
   CarouselPrevious,
-  type CarouselApi, // Import the correct type for `emblaApi`
+  type CarouselApi, 
 } from '@/components/ui/carousel'
 import { useState, useRef, useEffect } from 'react'
 import Link from 'next/link'
@@ -69,7 +69,7 @@ export function HomeCarousel({
         ))}
       </CarouselContent>
       <CarouselPrevious className='left-0 md:left-12' />
-      <CarouselNext className='right-0 md:right-12' />
+      <CarouselNext className='right-0 md:right-12 ' />
     </Carousel>
   )
 }
