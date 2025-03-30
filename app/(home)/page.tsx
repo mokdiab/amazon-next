@@ -13,6 +13,7 @@ import { toSlug } from '@/lib/utils'
 export default async function HomePage() {
   const categories = (await getAllCategories()).slice(0, 4)
   const todaysDeals = await getProductsByTag({ tag: 'todays-deal' })
+  const bestSellingProducts = await getProductsByTag({ tag: 'best-seller' })
   const newArrivals = await getProductsForCard({
     tag: 'new-arrival',
     limit: 4,
@@ -74,6 +75,15 @@ export default async function HomePage() {
             <ProductSlider title={"Today's Deals"} products={todaysDeals} />
           </CardContent>
         </Card>
+        <Card className='w-full rounded-none'>
+       <CardContent className='p-4 items-center gap-3'>
+         <ProductSlider
+           title='Best Selling Products'
+           products={bestSellingProducts}
+           hideDetails
+         />
+       </CardContent>
+     </Card>
       </div>
     </>
   )
