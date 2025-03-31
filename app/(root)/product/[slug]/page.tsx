@@ -9,6 +9,8 @@ import { Card, CardContent } from '@/components/ui/card'
    import { Separator } from '@/components/ui/separator'
    import ProductSlider from '@/components/shared/product/product-slider'
    import Rating from '@/components/shared/product/rating'
+import BrowsingHistoryList from '@/components/shared/browsing-history-list'
+import AddToBrowsingHistory from '@/components/shared/product/add-to-browsing-history'
 
    export async function generateMetadata(props: {
      params: Promise<{ slug: string }>
@@ -41,6 +43,7 @@ import { Card, CardContent } from '@/components/ui/card'
      })
      return (
        <div>
+        <AddToBrowsingHistory id={product._id} category={product.category} />
          <section>
            <div className='grid grid-cols-1 md:grid-cols-5  '>
              <div className='col-span-2'>
@@ -113,6 +116,9 @@ import { Card, CardContent } from '@/components/ui/card'
              title={`Best Sellers in ${product.category}`}
            />
          </section>
+         <section>
+     <BrowsingHistoryList className='mt-10' />
+   </section>
        </div>
      )
    }
