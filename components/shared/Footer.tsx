@@ -1,6 +1,6 @@
 'use client'
 import { ChevronUp } from "lucide-react";
-import { Button } from "../button";
+import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { APP_NAME } from "@/lib/constants";
 

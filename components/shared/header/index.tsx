@@ -2,7 +2,7 @@ import { APP_NAME } from "@/lib/constants";
 import Image from "next/image";
 import Link from "next/link";
 import Menu from "./Menu";
-import { Button } from "../../button";
+import { Button } from "../../ui/button";
 import { MenuIcon } from "lucide-react";
 import data from "@/lib/data";
 import Search from "./Search";

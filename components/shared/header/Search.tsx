@@ -1,7 +1,7 @@
 import { SearchIcon, ChevronDownIcon } from "lucide-react"
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@radix-ui/react-select"
 import {APP_NAME } from "@/lib/constants"
-import { Input } from "../../input"
+import { Input } from "../../ui/input"
 const categories = ['men', 'women', 'kids','accessories']
 
 async function Search() {

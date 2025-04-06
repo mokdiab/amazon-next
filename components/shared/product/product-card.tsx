@@ -1,17 +1,19 @@
 import Image from 'next/image'
    import Link from 'next/link'
    import React from 'react'
-   import { Card, CardContent, CardHeader } from '@/components/ui/card'
+   import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
    import { IProduct } from '@/lib/db/models/product.model'
    import Rating from './rating'
-   import { formatNumber } from '@/lib/utils'
+   import { formatNumber, generateId, round2 } from '@/lib/utils'
    import ProductPrice from './product-price'
 import ImageHover from './image-hover'
+import AddToCart from './add-to-cart'
 
    const ProductCard = ({
      product,
      hideBorder = false,
      hideDetails = false,
+     hideAddToCart = false,
    }: {
      product: IProduct
      hideDetails?: boolean
@@ -41,6 +43,7 @@ import ImageHover from './image-hover'
          </div>
       
      )
+
      const ProductDetails = () => (
        <div className='flex-1 space-y-2'>
          <p className='font-bold'>{product.brand}</p>
@@ -67,7 +70,26 @@ import ImageHover from './image-hover'
          />
        </div>
      )
-
+     const AddButton = () => (
+      <div className='w-full text-center'>
+        <AddToCart
+          minimal
+          item={{
+            clientId: generateId(),
+            product: product._id,
+            size: product.sizes[0],
+            color: product.colors[0],
+            countInStock: product.countInStock,
+            name: product.name,
+            slug: product.slug,
+            category: product.category,
+            price: round2(product.price),
+            quantity: 1,
+            image: product.images[0],
+          }}
+        />
+      </div>
+    )
      return hideBorder ? (
        <Link href={`/product/${product.slug}`}>
        <div className='flex flex-col'>
@@ -77,6 +99,7 @@ import ImageHover from './image-hover'
              <div className='p-3 flex-1 text-center'>
                <ProductDetails />
              </div>
+             {!hideAddToCart && <AddButton />}
            </>
          )}
        </div>
@@ -92,6 +115,9 @@ import ImageHover from './image-hover'
              <CardContent className='p-3 flex-1  text-center'>
                <ProductDetails />
              </CardContent>
+             <CardFooter className='p-3'>
+               {!hideAddToCart && <AddButton />}
+             </CardFooter>
            </>
          )}
        </Card>

@@ -54,7 +54,6 @@
        }
        fetchProducts()
      }, [products, type])
-
      return (
        data.length > 0 && (
          <ProductSlider

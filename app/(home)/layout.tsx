@@ -1,5 +1,5 @@
-import Header from "@/components/ui/shared/header"
-import Footer from "@/components/ui/shared/Footer"
+import Header from "@/components/shared/header"
+import Footer from "@/components/shared/Footer"
 
 export default function HomeLayout({
     children
