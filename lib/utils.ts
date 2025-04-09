@@ -1,5 +1,5 @@
-import { clsx, type ClassValue } from "clsx"
-import { twMerge } from "tailwind-merge"
+import { clsx, type ClassValue } from 'clsx'
+import { twMerge } from 'tailwind-merge'
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -29,15 +29,17 @@ export const toSlug = (text: string): string =>
     .replace(/[^\w\s-]+/g, '')
     .replace(/\s+/g, '-')
     .replace(/^-+|-+$/g, '')
+    .replace(/-+/g, '-')
 
 export const round2 = (num: number) =>
   Math.round((num + Number.EPSILON) * 100) / 100
 
 export const generateId = () => {
-  const timestamp = Date.now().toString();
-  const randomDigits = Array.from(crypto.getRandomValues(new Uint8Array(10)), (num) =>
-    (num % 10).toString()
-  ).join('');
+  const timestamp = Date.now().toString()
+  const randomDigits = Array.from(
+    crypto.getRandomValues(new Uint8Array(10)),
+    (num) => (num % 10).toString()
+  ).join('')
 
-  return timestamp + randomDigits;
-};
+  return timestamp + randomDigits
+}
