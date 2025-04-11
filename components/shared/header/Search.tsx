@@ -14,10 +14,7 @@ async function Search() {
   return (
     <form action='/search' method='GET' className='flex  items-stretch h-10 '>
       <Select name='category'>
-        <SelectTrigger
-          size=''
-          className='w-auto h-full dark:border-gray-200 bg-gray-100 text-black border-r  rounded-r-none rounded-l-md rtl:rounded-r-md rtl:rounded-l-none'
-        >
+        <SelectTrigger className='w-auto h-full dark:border-gray-200 bg-gray-100 text-black border-r  rounded-r-none rounded-l-md rtl:rounded-r-md rtl:rounded-l-none'>
           <SelectValue placeholder='All' />
         </SelectTrigger>
         <SelectContent position='popper'>

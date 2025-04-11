@@ -12,6 +12,6 @@ export default function AddToBrowsingHistory({
   const { addItem } = useBrowsingHistory()
   useEffect(() => {
     addItem({ id, category })
-  }, [])
+  }, [addItem, id, category])
   return null
 }

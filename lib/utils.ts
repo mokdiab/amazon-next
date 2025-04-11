@@ -43,6 +43,7 @@ export const generateId = () => {
 
   return timestamp + randomDigits
 }
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const formatError = (error: any): string => {
   if (error.name === 'ZodError') {
     const fieldErrors = Object.keys(error.errors).map((field) => {
