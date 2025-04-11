@@ -54,14 +54,14 @@ export default function CredentialsSignInForm() {
       setIsLoading(false)
     }
   }
-  const { handleSubmit } = form
+  const { control, handleSubmit } = form
   return (
     <Form {...form}>
       <form onSubmit={handleSubmit(onSubmit)} className='space-y-6'>
         <input type='hidden' name='callbackUrl' value={callbackUrl} />
 
         <FormField
-          control={form.control}
+          control={control}
           name='email'
           render={({ field }) => (
             <FormItem>
@@ -79,7 +79,7 @@ export default function CredentialsSignInForm() {
         />
 
         <FormField
-          control={form.control}
+          control={control}
           name='password'
           render={({ field }) => (
             <FormItem>
