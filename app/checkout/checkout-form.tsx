@@ -466,7 +466,7 @@ const CheckoutForm = () => {
           {/* items and delivery date */}
           <div>
             {isDeliveryDateSelected && deliveryDateIndex != undefined ? (
-              <div className='grid  grid-cols-1 md:grid-cols-12  my-3 pb-3'>
+              <div className='grid grid-cols-1 md:grid-cols-12  my-3 pb-3'>
                 <div className='flex text-lg font-bold  col-span-5'>
                   <span className='w-8'>3 </span>
                   <span>Items and shipping</span>
@@ -531,15 +531,17 @@ const CheckoutForm = () => {
                         {items.map((item, _index) => (
                           <div key={_index} className='flex gap-4 py-2'>
                             <div className='relative w-16 h-16'>
-                              <Image
-                                src={item.image}
-                                alt={item.name}
-                                fill
-                                sizes='20vw'
-                                style={{
-                                  objectFit: 'contain',
-                                }}
-                              />
+                              <Link href={`product/${item.slug}`}>
+                                <Image
+                                  src={item.image}
+                                  alt={item.name}
+                                  fill
+                                  sizes='20vw'
+                                  style={{
+                                    objectFit: 'contain',
+                                  }}
+                                />
+                              </Link>
                             </div>
 
                             <div className='flex-1'>
@@ -563,6 +565,9 @@ const CheckoutForm = () => {
                                   </SelectValue>
                                 </SelectTrigger>
                                 <SelectContent position='popper'>
+                                  <SelectItem key='delete' value='0'>
+                                    Delete
+                                  </SelectItem>
                                   {Array.from({
                                     length: item.countInStock,
                                   }).map((_, i) => (
@@ -570,9 +575,6 @@ const CheckoutForm = () => {
                                       {i + 1}
                                     </SelectItem>
                                   ))}
-                                  <SelectItem key='delete' value='0'>
-                                    Delete
-                                  </SelectItem>
                                 </SelectContent>
                               </Select>
                             </div>
@@ -581,7 +583,7 @@ const CheckoutForm = () => {
                       </div>
                       <div>
                         <div className=' font-bold'>
-                          <p className='mb-2'> Choose a shipping speed:</p>
+                          <p className='mb-2'>Choose a shipping speed:</p>
 
                           <ul>
                             <RadioGroup
