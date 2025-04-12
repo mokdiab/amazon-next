@@ -19,6 +19,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { createOrder } from '@/lib/actions/order.actions'
+import { toast } from 'sonner'
 import {
   calculateFutureDate,
   formatDateTime,
@@ -81,6 +83,7 @@ const CheckoutForm = () => {
     setShippingAddress,
     setPaymentMethod,
     updateItem,
+    clearCart,
     removeItem,
     setDeliveryDateIndex,
   } = useCartStore()
@@ -113,7 +116,26 @@ const CheckoutForm = () => {
     useState<boolean>(false)
 
   const handlePlaceOrder = async () => {
-    // TODO: place order
+    const res = await createOrder({
+      items,
+      shippingAddress,
+      expectedDeliveryDate: calculateFutureDate(
+        AVAILABLE_DELIVERY_DATES[deliveryDateIndex!].daysToDeliver
+      ),
+      deliveryDateIndex,
+      paymentMethod,
+      itemsPrice,
+      shippingPrice,
+      taxPrice,
+      totalPrice,
+    })
+    if (!res.success) {
+      toast.error(res.message)
+    } else {
+      toast.success(res.message)
+      clearCart()
+      router.push(`/checkout/${res.data?.orderId}`)
+    }
   }
   const handleSelectPaymentMethod = () => {
     setIsAddressSelected(true)
