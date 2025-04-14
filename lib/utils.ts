@@ -97,7 +97,9 @@ export function timeUntilMidnight(): { hours: number; minutes: number } {
 
   return { hours, minutes }
 }
-
+export function formatId(id: string) {
+  return `..${id.substring(id.length - 6)}`
+}
 export const formatDateTime = (dateString: Date) => {
   const dateTimeOptions: Intl.DateTimeFormatOptions = {
     month: 'short', // abbreviated month name (e.g., 'Oct')
