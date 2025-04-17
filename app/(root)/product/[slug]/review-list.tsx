@@ -1,8 +1,8 @@
 'use client'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Calendar, Check, StarIcon, User } from 'lucide-react'
+import { Calendar, Check, User } from 'lucide-react'
 import Link from 'next/link'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { useInView } from 'react-intersection-observer'
 import { z } from 'zod'
@@ -33,25 +33,20 @@ import {
   FormMessage,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
 import { toast } from 'sonner'
 import {
   createUpdateReview,
   getReviewByProductId,
   getReviews,
+  deleteReview,
 } from '@/lib/actions/review.actions'
 import { ReviewInputSchema } from '@/lib/validator'
 import RatingSummary from '@/components/shared/product/rating-summary'
 import { IProduct } from '@/lib/db/models/product.model'
 import { Separator } from '@/components/ui/separator'
 import { IReviewDetails } from '@/types'
+import RatingInput from '@/components/shared/product/rating-input'
 
 const reviewFormDefaultValues = {
   title: '',
@@ -68,19 +63,26 @@ export default function ReviewList({
 }) {
   const [page, setPage] = useState(2)
   const [totalPages, setTotalPages] = useState(0)
+  const [userReview, setUserReview] = useState<CustomerReview | null>(null)
   const [reviews, setReviews] = useState<IReviewDetails[]>([])
   const { ref, inView } = useInView({ triggerOnce: true })
-  const reload = async () => {
+  const reload = useCallback(async () => {
     try {
       const res = await getReviews({ productId: product._id, page: 1 })
       setReviews([...res.data])
       setTotalPages(res.totalPages)
+      const currentReview = await getReviewByProductId({
+        productId: product._id,
+      })
+      if (currentReview) {
+        setUserReview(currentReview)
+      }
 
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (err) {
-      toast.error('Error in fetching reviews')
+      toast.error('Failed to load reviews')
     }
-  }
+  }, [product._id, reviews, page])
 
   const loadMoreReviews = async () => {
     if (totalPages !== 0 && page > totalPages) return
@@ -94,32 +96,37 @@ export default function ReviewList({
 
   const [loadingReviews, setLoadingReviews] = useState(false)
   useEffect(() => {
-    const loadReviews = async () => {
-      setLoadingReviews(true)
-      const res = await getReviews({ productId: product._id, page: 1 })
-      setReviews([...res.data])
-      setTotalPages(res.totalPages)
-      setLoadingReviews(false)
-    }
-
-    if (inView) {
-      loadReviews()
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    if (inView) reload()
   }, [inView])
 
   type CustomerReview = z.infer<typeof ReviewInputSchema>
   const form = useForm<CustomerReview>({
     resolver: zodResolver(ReviewInputSchema),
-    defaultValues: reviewFormDefaultValues,
+    defaultValues: userReview ?? reviewFormDefaultValues,
   })
   const [open, setOpen] = useState(false)
+
   const onSubmit: SubmitHandler<CustomerReview> = async (values) => {
     const res = await createUpdateReview({
       data: { ...values, product: product._id },
       path: `/product/${product.slug}`,
     })
     if (!res.success) return toast.error(res.message)
+    setOpen(false)
+    reload()
+    toast.success(res.message)
+  }
+  const handleDelete = async () => {
+    const res = await deleteReview({
+      productId: product._id,
+      path: `/product/${product.slug}`,
+    })
+    if (!res.success) {
+      toast.error(res.message)
+      return
+    }
+    form.reset()
+    setUserReview(null)
     setOpen(false)
     reload()
     toast.success(res.message)
@@ -156,112 +163,128 @@ export default function ReviewList({
             </h3>
             <p className='text-sm'>Share your thoughts with other customers</p>
             {userId ? (
-              <Dialog open={open} onOpenChange={setOpen}>
-                <Button
-                  onClick={handleOpenForm}
-                  variant='outline'
-                  className=' rounded-full w-full'
-                >
-                  Write a customer review
-                </Button>
+              <>
+                {userReview && (
+                  <div className='mt-3 space-y-4'>
+                    <p className='font-bold'>Your review:</p>
+                    <div className='px-4 py-2 w-full flex flex-col gap-2 rounded-lg border border-primary break-words'>
+                      <p className='text-sm break-words whitespace-pre-wrap overflow-hidden'>
+                        <span className='font-bold'>Title:</span>{' '}
+                        {userReview.title}
+                      </p>
+                      <p className='text-sm break-words whitespace-pre-wrap overflow-hidden'>
+                        <span className='font-bold'>Comment:</span>{' '}
+                        {userReview.comment}
+                      </p>
+                      <Rating rating={userReview.rating} size={5} />
+                    </div>
+                  </div>
+                )}
+                <Dialog open={open} onOpenChange={setOpen}>
+                  <Button
+                    onClick={handleOpenForm}
+                    variant='outline'
+                    className=' rounded-full w-full'
+                  >
+                    {userReview ? 'Edit review' : 'Write a customer review'}
+                  </Button>
+                  {userReview && (
+                    <Button
+                      onClick={handleDelete}
+                      variant='destructive'
+                      className=' rounded-full w-full'
+                    >
+                      Delete review
+                    </Button>
+                  )}
 
-                <DialogContent className='sm:max-w-[425px]'>
-                  <Form {...form}>
-                    <form method='post' onSubmit={form.handleSubmit(onSubmit)}>
-                      <DialogHeader>
-                        <DialogTitle>Write a customer review</DialogTitle>
-                        <DialogDescription>
-                          Share your thoughts with other customers
-                        </DialogDescription>
-                      </DialogHeader>
-                      <div className='grid gap-4 py-4'>
-                        <div className='flex flex-col gap-5  '>
-                          <FormField
-                            control={form.control}
-                            name='title'
-                            render={({ field }) => (
-                              <FormItem className='w-full'>
-                                <FormLabel>Title</FormLabel>
-                                <FormControl>
-                                  <Input placeholder='Enter title' {...field} />
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-
-                          <FormField
-                            control={form.control}
-                            name='comment'
-                            render={({ field }) => (
-                              <FormItem className='w-full'>
-                                <FormLabel>Comment</FormLabel>
-                                <FormControl>
-                                  <Textarea
-                                    placeholder='Enter comment'
-                                    {...field}
-                                  />
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-                        </div>
-                        <div>
-                          <FormField
-                            control={form.control}
-                            name='rating'
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>Rating</FormLabel>
-                                <Select
-                                  onValueChange={field.onChange}
-                                  value={field.value.toString()}
-                                >
+                  <DialogContent className='sm:max-w-[425px]'>
+                    <Form {...form}>
+                      <form
+                        method='post'
+                        onSubmit={form.handleSubmit(onSubmit)}
+                      >
+                        <DialogHeader>
+                          <DialogTitle>Write a customer review</DialogTitle>
+                          <DialogDescription>
+                            Share your thoughts with other customers
+                          </DialogDescription>
+                        </DialogHeader>
+                        <div className='grid gap-4 py-4'>
+                          <div>
+                            <FormField
+                              control={form.control}
+                              name='rating'
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>Rating</FormLabel>
+                                  <RatingInput {...field} />
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                          </div>
+                          <div className='flex flex-col gap-5  '>
+                            <FormField
+                              control={form.control}
+                              name='title'
+                              render={({ field }) => (
+                                <FormItem className='w-full'>
+                                  <FormLabel>Title</FormLabel>
                                   <FormControl>
-                                    <SelectTrigger>
-                                      <SelectValue placeholder='Select a rating' />
-                                    </SelectTrigger>
+                                    <Input
+                                      placeholder='Enter title'
+                                      {...field}
+                                    />
                                   </FormControl>
-                                  <SelectContent>
-                                    {Array.from({ length: 5 }).map(
-                                      (_, index) => (
-                                        <SelectItem
-                                          key={index}
-                                          value={(index + 1).toString()}
-                                        >
-                                          <div className='flex items-center gap-1'>
-                                            {index + 1}{' '}
-                                            <StarIcon className='h-4 w-4' />
-                                          </div>
-                                        </SelectItem>
-                                      )
-                                    )}
-                                  </SelectContent>
-                                </Select>
-
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                            <FormField
+                              control={form.control}
+                              name='comment'
+                              render={({ field }) => (
+                                <FormItem className='w-full'>
+                                  <FormLabel>Comment</FormLabel>
+                                  <FormControl>
+                                    <Textarea
+                                      placeholder='Enter comment'
+                                      {...field}
+                                    />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                          </div>
                         </div>
-                      </div>
-
-                      <DialogFooter>
-                        <Button
-                          type='submit'
-                          size='lg'
-                          disabled={form.formState.isSubmitting}
-                        >
-                          {form.formState.isSubmitting
-                            ? 'Submitting...'
-                            : 'Submit'}
-                        </Button>
-                      </DialogFooter>
-                    </form>
-                  </Form>
-                </DialogContent>
-              </Dialog>
+                        <DialogFooter>
+                          {userReview && (
+                            <Button
+                              type='button'
+                              variant={'destructive'}
+                              size='lg'
+                              onClick={handleDelete}
+                            >
+                              Delete
+                            </Button>
+                          )}
+                          <Button
+                            type='submit'
+                            size='lg'
+                            disabled={form.formState.isSubmitting}
+                          >
+                            {form.formState.isSubmitting
+                              ? 'Submitting...'
+                              : 'Submit'}
+                          </Button>
+                        </DialogFooter>
+                      </form>
+                    </Form>
+                  </DialogContent>
+                </Dialog>
+              </>
             ) : (
               <div>
                 Please{' '}
@@ -305,8 +328,12 @@ export default function ReviewList({
           ))}
           <div ref={ref}>
             {page <= totalPages && (
-              <Button variant={'link'} onClick={loadMoreReviews}>
-                See more reviews
+              <Button
+                variant={'link'}
+                onClick={loadMoreReviews}
+                disabled={loadingReviews}
+              >
+                {loadingReviews ? 'Loading...' : 'See more reviews'}
               </Button>
             )}
 

@@ -144,3 +144,49 @@ export const getReviewByProductId = async ({
   })
   return review ? (JSON.parse(JSON.stringify(review)) as IReview) : null
 }
+
+export async function deleteReview({
+  productId,
+  path,
+}: {
+  productId: string
+  path: string
+}) {
+  try {
+    const session = await auth()
+    if (!session) {
+      throw new Error('User is not authenticated')
+    }
+
+    await connectToDatabase()
+
+    // Delete the review
+    const deletedReview = await Review.findOneAndDelete({
+      product: productId,
+      user: session.user.id,
+    })
+
+    if (!deletedReview) {
+      return {
+        success: false,
+        message: 'Review not found or already deleted',
+      }
+    }
+
+    // Recalculate product review stats
+    await updateProductReview(productId)
+
+    // Revalidate the path to update the UI
+    revalidatePath(path)
+
+    return {
+      success: true,
+      message: 'Review deleted successfully',
+    }
+  } catch (error) {
+    return {
+      success: false,
+      message: formatError(error),
+    }
+  }
+}
