@@ -23,13 +23,14 @@ import { isRedirectError } from 'next/dist/client/components/redirect-error'
 import { APP_NAME } from '@/lib/constants'
 import { useState } from 'react'
 import { EyeIcon, EyeOffIcon } from 'lucide-react'
+import { PasswordStrength } from '@/components/shared/password-strength'
 const signUpDefaultValues =
   process.env.NODE_ENV === 'development'
     ? {
         name: 'Mohamed Diab',
         email: 'mohammedkamal5@yahoo.com',
-        password: 'Diab123',
-        confirmPassword: 'Diab123',
+        password: 'Diab@1234',
+        confirmPassword: 'Diab@1234',
       }
     : {
         name: '',
@@ -135,6 +136,7 @@ export default function SignUpForm() {
                   </div>
                 </FormControl>
                 <FormMessage />
+                <PasswordStrength password={field.value} />
               </FormItem>
             )}
           />

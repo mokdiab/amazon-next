@@ -31,7 +31,7 @@ export default function CredentialsSignInForm() {
     process.env.NODE_ENV === 'development'
       ? {
           email: 'admin@example.com',
-          password: 'Diab123',
+          password: 'Diab@1234',
         }
       : {
           email: '',

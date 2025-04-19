@@ -23,11 +23,6 @@ export const AVAILABLE_PAYMENT_METHODS = [
     isDefault: false,
   },
   {
-    name: 'Stripe',
-    commission: 0,
-    isDefault: false,
-  },
-  {
     name: 'Cash On Delivery',
     commission: 0,
     isDefault: true,

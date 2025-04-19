@@ -110,7 +110,40 @@ const UserName = z
   .min(2, { message: 'Username must be at least 2 characters' })
   .max(50, { message: 'Username must be at most 30 characters' })
 const Email = z.string().min(1, 'Email is required').email('Email is invalid')
-const Password = z.string().min(3, 'Password must be at least 3 characters')
+// Base password requirements (reusable)
+export const BasePasswordSchema = z
+  .string()
+  .min(8, 'Password must be at least 8 characters')
+  .max(50, 'Password must be less than 50 characters')
+  .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
+  .regex(/[a-z]/, 'Password must contain at least one lowercase letter')
+  .regex(/[0-9]/, 'Password must contain at least one number')
+  .regex(/[^A-Za-z0-9]/, 'Password must contain at least one special character')
+
+// Schema for password update form
+export const PasswordUpdateSchema = z
+  .object({
+    currentPassword: z.string().min(1, 'Current password is required'),
+    newPassword: BasePasswordSchema,
+    confirmPassword: z.string().min(1, 'Please confirm your password'),
+  })
+  .refine((data) => data.newPassword === data.confirmPassword, {
+    message: "Passwords don't match",
+    path: ['confirmPassword'],
+  })
+export const EmailSchema = z.object({
+  email: z.string().email('Please enter a valid email address'),
+})
+// Schema for sign-up form (if needed)
+export const SignUpPasswordSchema = z
+  .object({
+    password: BasePasswordSchema,
+    confirmPassword: z.string().min(1, 'Please confirm your password'),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords don't match",
+    path: ['confirmPassword'],
+  })
 const UserRole = z.string().min(1, 'role is required')
 
 export const UserInputSchema = z.object({
@@ -119,7 +152,7 @@ export const UserInputSchema = z.object({
   image: z.string().optional(),
   emailVerified: z.boolean(),
   role: UserRole,
-  password: Password,
+  password: BasePasswordSchema,
   paymentMethod: z.string().min(1, 'Payment method is required'),
   address: z.object({
     fullName: z.string().min(1, 'Full name is required'),
@@ -131,18 +164,24 @@ export const UserInputSchema = z.object({
     phone: z.string().min(1, 'Phone number is required'),
   }),
 })
-
+export const UserNameSchema = z.object({
+  name: UserName,
+})
 export const UserSignInSchema = z.object({
   email: Email,
-  password: Password,
+  password: z.string().min(1, 'Password is required'), // Simplified for sign in
 })
-export const UserSignUpSchema = UserSignInSchema.extend({
-  name: UserName,
-  confirmPassword: Password,
-}).refine((data) => data.password === data.confirmPassword, {
-  message: "Passwords don't match",
-  path: ['confirmPassword'],
-})
+export const UserSignUpSchema = z
+  .object({
+    name: UserName,
+    email: Email,
+    password: BasePasswordSchema,
+    confirmPassword: z.string().min(1, 'Please confirm your password'),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords don't match",
+    path: ['confirmPassword'],
+  })
 
 // ORDER
 export const OrderInputSchema = z.object({

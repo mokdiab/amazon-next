@@ -9,7 +9,7 @@ import Order, { IOrder } from '../db/models/order.model'
 import { revalidatePath } from 'next/cache'
 import { sendPurchaseReceipt } from '@/emails'
 import { paypal } from '../paypal'
-import { AVAILABLE_DELIVERY_DATES } from '../constants'
+import { AVAILABLE_DELIVERY_DATES, PAGE_SIZE } from '../constants'
 export const calcDeliveryDateAndPrice = async ({
   items,
   shippingAddress,
@@ -99,7 +99,33 @@ export const createOrderFromCart = async (
   })
   return await Order.create(order)
 }
+export async function getMyOrders({
+  limit,
+  page,
+}: {
+  limit?: number
+  page: number
+}) {
+  limit = limit || PAGE_SIZE
+  await connectToDatabase()
+  const session = await auth()
+  if (!session) {
+    throw new Error('User is not authenticated')
+  }
+  const skipAmount = (Number(page) - 1) * limit
+  const orders = await Order.find({
+    user: session?.user?.id,
+  })
+    .sort({ createdAt: 'desc' })
+    .skip(skipAmount)
+    .limit(limit)
+  const ordersCount = await Order.countDocuments({ user: session?.user?.id })
 
+  return {
+    data: JSON.parse(JSON.stringify(orders)),
+    totalPages: Math.ceil(ordersCount / limit),
+  }
+}
 export async function getOrderById(orderId: string): Promise<IOrder> {
   await connectToDatabase()
   const order = await Order.findById(orderId)

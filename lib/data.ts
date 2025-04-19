@@ -711,7 +711,7 @@ const users: IUserInput[] = [
   {
     name: 'Diab',
     email: 'admin@example.com',
-    password: bcrypt.hashSync('Diab123', 5),
+    password: bcrypt.hashSync('Diab@1234', 10),
     role: 'Admin',
     address: {
       fullName: 'Mohamed Diab',
@@ -722,13 +722,13 @@ const users: IUserInput[] = [
       country: 'Egypt',
       phone: '123-456-7890',
     },
-    paymentMethod: 'Stripe',
+    paymentMethod: 'PayPal',
     emailVerified: false,
   },
   {
     name: 'Jane',
     email: 'jane@example.com',
-    password: bcrypt.hashSync('123456', 5),
+    password: bcrypt.hashSync('Jane@1234', 10),
     role: 'User',
     address: {
       fullName: 'Jane Harris',
@@ -745,7 +745,7 @@ const users: IUserInput[] = [
   {
     name: 'Jack',
     email: 'jack@example.com',
-    password: bcrypt.hashSync('123456', 5),
+    password: bcrypt.hashSync('Jack@1234', 10),
     role: 'User',
     address: {
       fullName: 'Jack Ryan',
@@ -762,7 +762,7 @@ const users: IUserInput[] = [
   {
     name: 'Sarah',
     email: 'sarah@example.com',
-    password: bcrypt.hashSync('123456', 5),
+    password: bcrypt.hashSync('Sarah@1234', 10),
     role: 'User',
     address: {
       fullName: 'Sarah Smith',
@@ -779,7 +779,7 @@ const users: IUserInput[] = [
   {
     name: 'Michael',
     email: 'michael@example.com',
-    password: bcrypt.hashSync('123456', 5),
+    password: bcrypt.hashSync('Michael@1234', 10),
     role: 'User',
     address: {
       fullName: 'John Alexander',
@@ -796,7 +796,7 @@ const users: IUserInput[] = [
   {
     name: 'Emily',
     email: 'emily@example.com',
-    password: bcrypt.hashSync('123456', 5),
+    password: bcrypt.hashSync('Emily@1234', 10),
     role: 'User',
     address: {
       fullName: 'Emily Johnson',
@@ -807,13 +807,13 @@ const users: IUserInput[] = [
       country: 'USA',
       phone: '123-456-7890',
     },
-    paymentMethod: 'Stripe',
+    paymentMethod: 'PayPal',
     emailVerified: false,
   },
   {
     name: 'Alice',
     email: 'alice@example.com',
-    password: bcrypt.hashSync('123456', 5),
+    password: bcrypt.hashSync('Alice@1234', 10),
     role: 'User',
     address: {
       fullName: 'Alice Cooper',
@@ -830,7 +830,7 @@ const users: IUserInput[] = [
   {
     name: 'Tom',
     email: 'tom@example.com',
-    password: bcrypt.hashSync('123456', 5),
+    password: bcrypt.hashSync('Tom@1234', 10),
     role: 'User',
     address: {
       fullName: 'Tom Hanks',
@@ -841,13 +841,13 @@ const users: IUserInput[] = [
       country: 'USA',
       phone: '123-456-7890',
     },
-    paymentMethod: 'Stripe',
+    paymentMethod: 'PayPal',
     emailVerified: false,
   },
   {
     name: 'Linda',
     email: 'linda@example.com',
-    password: bcrypt.hashSync('123456', 5),
+    password: bcrypt.hashSync('Linda@1234', 10),
     role: 'User',
     address: {
       fullName: 'Linda Holmes',
@@ -864,7 +864,7 @@ const users: IUserInput[] = [
   {
     name: 'George',
     email: 'george@example.com',
-    password: bcrypt.hashSync('123456', 5),
+    password: bcrypt.hashSync('George@1234', 10),
     role: 'User',
     address: {
       fullName: 'George Smith',
@@ -875,13 +875,13 @@ const users: IUserInput[] = [
       country: 'USA',
       phone: '123-456-7890',
     },
-    paymentMethod: 'Stripe',
+    paymentMethod: 'PayPal',
     emailVerified: false,
   },
   {
     name: 'Jessica',
     email: 'jessica@example.com',
-    password: bcrypt.hashSync('123456', 5),
+    password: bcrypt.hashSync('Jessica@1234', 10),
     role: 'User',
     address: {
       fullName: 'Jessica Brown',
@@ -898,7 +898,7 @@ const users: IUserInput[] = [
   {
     name: 'Chris',
     email: 'chris@example.com',
-    password: bcrypt.hashSync('123456', 5),
+    password: bcrypt.hashSync('Chris@1234', 10),
     role: 'User',
     address: {
       fullName: 'Chris Evans',
@@ -915,7 +915,7 @@ const users: IUserInput[] = [
   {
     name: 'Samantha',
     email: 'samantha@example.com',
-    password: bcrypt.hashSync('123456', 5),
+    password: bcrypt.hashSync('Samantha@1234', 10),
     role: 'User',
     address: {
       fullName: 'Samantha Wilson',
@@ -926,13 +926,13 @@ const users: IUserInput[] = [
       country: 'USA',
       phone: '123-456-7890',
     },
-    paymentMethod: 'Stripe',
+    paymentMethod: 'PayPal',
     emailVerified: false,
   },
   {
     name: 'David',
     email: 'david@example.com',
-    password: bcrypt.hashSync('123456', 5),
+    password: bcrypt.hashSync('David@1234', 10),
     role: 'User',
     address: {
       fullName: 'David Lee',
@@ -949,7 +949,7 @@ const users: IUserInput[] = [
   {
     name: 'Anna',
     email: 'anna@example.com',
-    password: bcrypt.hashSync('123456', 5),
+    password: bcrypt.hashSync('Anna@1234', 10),
     role: 'User',
     address: {
       fullName: 'Anna Smith',
@@ -964,6 +964,7 @@ const users: IUserInput[] = [
     emailVerified: false,
   },
 ]
+
 const reviews = [
   {
     rating: 1,
