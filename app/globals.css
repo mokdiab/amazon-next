@@ -123,4 +123,22 @@
   a.highlight-link {
     @apply text-sky-700  hover:text-orange-700 hover:underline;
   }
+  .item-button {
+    @apply p-3 hover:bg-muted hover:no-underline;
+  }
+}
+@keyframes shimmer {
+  0% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.5;
+  }
+}
+
+.animate-pulse {
+  animation: shimmer 1.5s ease-in-out infinite;
 }

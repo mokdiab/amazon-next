@@ -6,7 +6,6 @@ import { useCallback, useEffect, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { useInView } from 'react-intersection-observer'
 import { z } from 'zod'
-
 import Rating from '@/components/shared/product/rating'
 import { Button } from '@/components/ui/button'
 import {
@@ -65,25 +64,33 @@ export default function ReviewList({
   const [totalPages, setTotalPages] = useState(0)
   const [userReview, setUserReview] = useState<CustomerReview | null>(null)
   const [reviews, setReviews] = useState<IReviewDetails[]>([])
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false)
   const { ref, inView } = useInView({ triggerOnce: true })
+  const [loadingReviews, setLoadingReviews] = useState(false)
+  const [open, setOpen] = useState(false)
   const reload = useCallback(async () => {
     try {
       const res = await getReviews({ productId: product._id, page: 1 })
       setReviews([...res.data])
       setTotalPages(res.totalPages)
-      const currentReview = await getReviewByProductId({
-        productId: product._id,
-      })
-      if (currentReview) {
-        setUserReview(currentReview)
+      if (userId) {
+        try {
+          const currentReview = await getReviewByProductId({
+            productId: product._id,
+          })
+          setUserReview(currentReview || null) // Explicitly set null if undefined
+        } catch (reviewErr) {
+          console.error('Failed to fetch user review:', reviewErr)
+          setUserReview(null)
+        }
+      } else {
+        setUserReview(null)
       }
-
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (err) {
       toast.error('Failed to load reviews')
     }
-  }, [product._id, reviews, page])
-
+  }, [product._id, userId]) // Add userId as dependency
   const loadMoreReviews = async () => {
     if (totalPages !== 0 && page > totalPages) return
     setLoadingReviews(true)
@@ -94,7 +101,6 @@ export default function ReviewList({
     setPage(page + 1)
   }
 
-  const [loadingReviews, setLoadingReviews] = useState(false)
   useEffect(() => {
     if (inView) reload()
   }, [inView])
@@ -104,7 +110,6 @@ export default function ReviewList({
     resolver: zodResolver(ReviewInputSchema),
     defaultValues: userReview ?? reviewFormDefaultValues,
   })
-  const [open, setOpen] = useState(false)
 
   const onSubmit: SubmitHandler<CustomerReview> = async (values) => {
     const res = await createUpdateReview({
@@ -128,6 +133,7 @@ export default function ReviewList({
     form.reset()
     setUserReview(null)
     setOpen(false)
+    setDeleteConfirmOpen(false)
     reload()
     toast.success(res.message)
   }
@@ -190,9 +196,9 @@ export default function ReviewList({
                   </Button>
                   {userReview && (
                     <Button
-                      onClick={handleDelete}
+                      onClick={() => setDeleteConfirmOpen(true)}
                       variant='destructive'
-                      className=' rounded-full w-full'
+                      className='rounded-full w-full'
                     >
                       Delete review
                     </Button>
@@ -265,7 +271,10 @@ export default function ReviewList({
                               type='button'
                               variant={'destructive'}
                               size='lg'
-                              onClick={handleDelete}
+                              onClick={() => {
+                                setOpen(false)
+                                setDeleteConfirmOpen(true)
+                              }}
                             >
                               Delete
                             </Button>
@@ -282,6 +291,31 @@ export default function ReviewList({
                         </DialogFooter>
                       </form>
                     </Form>
+                  </DialogContent>
+                </Dialog>
+                <Dialog
+                  open={deleteConfirmOpen}
+                  onOpenChange={setDeleteConfirmOpen}
+                >
+                  <DialogContent className='sm:max-w-[425px]'>
+                    <DialogHeader>
+                      <DialogTitle>Confirm Deletion</DialogTitle>
+                      <DialogDescription>
+                        Are you sure you want to delete your review? This action
+                        cannot be undone.
+                      </DialogDescription>
+                    </DialogHeader>
+                    <DialogFooter>
+                      <Button
+                        variant='outline'
+                        onClick={() => setDeleteConfirmOpen(false)}
+                      >
+                        Cancel
+                      </Button>
+                      <Button variant='destructive' onClick={handleDelete}>
+                        Delete
+                      </Button>
+                    </DialogFooter>
                   </DialogContent>
                 </Dialog>
               </>
