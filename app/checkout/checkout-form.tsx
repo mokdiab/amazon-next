@@ -1,5 +1,5 @@
 'use client'
-import { Button } from '@/components/ui/button'
+import { LoadingButton } from '@/components/shared/LoadingButton'
 import { Card, CardContent, CardFooter } from '@/components/ui/card'
 import {
   Form,
@@ -149,12 +149,12 @@ const CheckoutForm = () => {
       <CardContent className='p-4'>
         {!isAddressSelected && (
           <div className='border-b mb-4'>
-            <Button
+            <LoadingButton
               className='rounded-full w-full'
               onClick={handleSelectShippingAddress}
             >
               Ship to this address
-            </Button>
+            </LoadingButton>
             <p className='text-xs text-center py-2'>
               Choose a shipping address and payment method in order to calculate
               shipping, handling, and tax.
@@ -163,12 +163,12 @@ const CheckoutForm = () => {
         )}
         {isAddressSelected && !isPaymentMethodSelected && (
           <div className=' mb-4'>
-            <Button
+            <LoadingButton
               className='rounded-full w-full'
               onClick={handleSelectPaymentMethod}
             >
               Use this payment method
-            </Button>
+            </LoadingButton>
 
             <p className='text-xs text-center py-2'>
               Choose a payment method to continue checking out. You&apos;ll
@@ -179,9 +179,13 @@ const CheckoutForm = () => {
         )}
         {isPaymentMethodSelected && isAddressSelected && (
           <div>
-            <Button onClick={handlePlaceOrder} className='rounded-full w-full'>
+            <LoadingButton
+              onClick={handlePlaceOrder}
+              className='rounded-full w-full'
+              loadingText='Placing Order...'
+            >
               Place Your Order
-            </Button>
+            </LoadingButton>
             <p className='text-xs text-center py-2'>
               By placing your order, you agree to {APP_NAME}&apos;s{' '}
               <Link href='/page/privacy-policy'>privacy notice</Link> and
@@ -253,7 +257,7 @@ const CheckoutForm = () => {
                   </p>
                 </div>
                 <div className='col-span-2'>
-                  <Button
+                  <LoadingButton
                     variant={'outline'}
                     onClick={() => {
                       setIsAddressSelected(false)
@@ -262,7 +266,7 @@ const CheckoutForm = () => {
                     }}
                   >
                     Change
-                  </Button>
+                  </LoadingButton>
                 </div>
               </div>
             ) : (
@@ -404,12 +408,13 @@ const CheckoutForm = () => {
                         </div>
                       </CardContent>
                       <CardFooter className='  p-4'>
-                        <Button
+                        <LoadingButton
                           type='submit'
                           className='rounded-full font-bold'
+                          loadingText='Shipping...'
                         >
                           Ship to this address
-                        </Button>
+                        </LoadingButton>
                       </CardFooter>
                     </Card>
                   </form>
@@ -429,7 +434,7 @@ const CheckoutForm = () => {
                   <p>{paymentMethod}</p>
                 </div>
                 <div className='col-span-2'>
-                  <Button
+                  <LoadingButton
                     variant='outline'
                     onClick={() => {
                       setIsPaymentMethodSelected(false)
@@ -437,7 +442,7 @@ const CheckoutForm = () => {
                     }}
                   >
                     Change
-                  </Button>
+                  </LoadingButton>
                 </div>
               </div>
             ) : isAddressSelected ? (
@@ -469,12 +474,12 @@ const CheckoutForm = () => {
                     </RadioGroup>
                   </CardContent>
                   <CardFooter className='p-4'>
-                    <Button
+                    <LoadingButton
                       onClick={handleSelectPaymentMethod}
                       className='rounded-full font-bold'
                     >
                       Use this payment method
-                    </Button>
+                    </LoadingButton>
                   </CardFooter>
                 </Card>
               </>
@@ -514,7 +519,7 @@ const CheckoutForm = () => {
                   </ul>
                 </div>
                 <div className='col-span-2'>
-                  <Button
+                  <LoadingButton
                     variant={'outline'}
                     onClick={() => {
                       setIsPaymentMethodSelected(true)
@@ -522,7 +527,7 @@ const CheckoutForm = () => {
                     }}
                   >
                     Change
-                  </Button>
+                  </LoadingButton>
                 </div>
               </div>
             ) : isPaymentMethodSelected && isAddressSelected ? (
@@ -677,9 +682,13 @@ const CheckoutForm = () => {
 
               <Card className='hidden md:block '>
                 <CardContent className='p-4 flex flex-col md:flex-row justify-between items-center gap-3'>
-                  <Button onClick={handlePlaceOrder} className='rounded-full'>
+                  <LoadingButton
+                    onClick={handlePlaceOrder}
+                    className='rounded-full'
+                    loadingText='Placing Order...'
+                  >
                     Place Your Order
-                  </Button>
+                  </LoadingButton>
                   <div className='flex-1'>
                     <p className='font-bold text-lg'>
                       Order Total: <ProductPrice price={totalPrice} plain />

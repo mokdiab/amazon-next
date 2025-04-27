@@ -46,6 +46,7 @@ import { IProduct } from '@/lib/db/models/product.model'
 import { Separator } from '@/components/ui/separator'
 import { IReviewDetails } from '@/types'
 import RatingInput from '@/components/shared/product/rating-input'
+import { LoadingButton } from '@/components/shared/LoadingButton'
 
 const reviewFormDefaultValues = {
   title: '',
@@ -70,7 +71,12 @@ export default function ReviewList({
   const [open, setOpen] = useState(false)
   const reload = useCallback(async () => {
     try {
-      const res = await getReviews({ productId: product._id, page: 1 })
+      const res = await getReviews({
+        productId: product._id,
+        page: 1,
+        limit: 5,
+      })
+      console.log(res)
       setReviews([...res.data])
       setTotalPages(res.totalPages)
       if (userId) {
@@ -94,7 +100,8 @@ export default function ReviewList({
   const loadMoreReviews = async () => {
     if (totalPages !== 0 && page > totalPages) return
     setLoadingReviews(true)
-    const res = await getReviews({ productId: product._id, page })
+    const res = await getReviews({ productId: product._id, page, limit: 5 })
+    console.log(res)
     setLoadingReviews(false)
     setReviews([...reviews, ...res.data])
     setTotalPages(res.totalPages)
@@ -187,21 +194,23 @@ export default function ReviewList({
                   </div>
                 )}
                 <Dialog open={open} onOpenChange={setOpen}>
-                  <Button
+                  <LoadingButton
+                    loadingText='Loading...'
                     onClick={handleOpenForm}
                     variant='outline'
                     className=' rounded-full w-full'
                   >
                     {userReview ? 'Edit review' : 'Write a customer review'}
-                  </Button>
+                  </LoadingButton>
                   {userReview && (
-                    <Button
+                    <LoadingButton
+                      loadingText='Deleting...'
                       onClick={() => setDeleteConfirmOpen(true)}
                       variant='destructive'
                       className='rounded-full w-full'
                     >
                       Delete review
-                    </Button>
+                    </LoadingButton>
                   )}
 
                   <DialogContent className='sm:max-w-[425px]'>
@@ -267,7 +276,8 @@ export default function ReviewList({
                         </div>
                         <DialogFooter>
                           {userReview && (
-                            <Button
+                            <LoadingButton
+                              loadingText='Deleting...'
                               type='button'
                               variant={'destructive'}
                               size='lg'
@@ -277,7 +287,7 @@ export default function ReviewList({
                               }}
                             >
                               Delete
-                            </Button>
+                            </LoadingButton>
                           )}
                           <Button
                             type='submit'
@@ -306,15 +316,20 @@ export default function ReviewList({
                       </DialogDescription>
                     </DialogHeader>
                     <DialogFooter>
-                      <Button
+                      <LoadingButton
+                        loadingText='Cancelling...'
                         variant='outline'
                         onClick={() => setDeleteConfirmOpen(false)}
                       >
                         Cancel
-                      </Button>
-                      <Button variant='destructive' onClick={handleDelete}>
+                      </LoadingButton>
+                      <LoadingButton
+                        loadingText='Deleting...'
+                        variant='destructive'
+                        onClick={handleDelete}
+                      >
                         Delete
-                      </Button>
+                      </LoadingButton>
                     </DialogFooter>
                   </DialogContent>
                 </Dialog>
@@ -334,8 +349,8 @@ export default function ReviewList({
           </div>
         </div>
         <div className='md:col-span-3 flex flex-col gap-3'>
-          {reviews.map((review: IReviewDetails) => (
-            <Card key={review._id}>
+          {reviews.map((review: IReviewDetails, i) => (
+            <Card key={`${i}-${review._id}`}>
               <CardHeader>
                 <div className='flex-between'>
                   <CardTitle>{review.title}</CardTitle>

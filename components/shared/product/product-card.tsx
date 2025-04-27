@@ -92,35 +92,35 @@ import AddToCart from './add-to-cart'
     )
      return hideBorder ? (
        <Link href={`/product/${product.slug}`}>
-       <div className='flex flex-col'>
-         <ProductImage />
-         {!hideDetails && (
-           <>
-             <div className='p-3 flex-1 text-center'>
-               <ProductDetails />
-             </div>
-             {!hideAddToCart && <AddButton />}
-           </>
-         )}
-       </div>
+         <div className='flex flex-col'>
+           <ProductImage />
+           {!hideDetails && (
+             <>
+               <div className='p-3 flex-1 text-center'>
+                 <ProductDetails />
+               </div>
+               {!hideAddToCart && <AddButton />}
+             </>
+           )}
+         </div>
        </Link>
      ) : (
        <Link href={`/product/${product.slug}`}>
-       <Card className='flex flex-col  '>
-         <CardHeader className='p-3'>
-           <ProductImage />
-         </CardHeader>
-         {!hideDetails && (
-           <>
-             <CardContent className='p-3 flex-1  text-center'>
-               <ProductDetails />
-             </CardContent>
-             <CardFooter className='p-3'>
-               {!hideAddToCart && <AddButton />}
-             </CardFooter>
-           </>
-         )}
-       </Card>
+         <Card className='flex flex-col h-full'>
+           <CardHeader className='p-3'>
+             <ProductImage />
+           </CardHeader>
+           {!hideDetails && (
+             <>
+               <CardContent className='p-3 flex-1  text-center'>
+                 <ProductDetails />
+               </CardContent>
+               <CardFooter className='p-3'>
+                 {!hideAddToCart && <AddButton />}
+               </CardFooter>
+             </>
+           )}
+         </Card>
        </Link>
      )
    }

@@ -10,6 +10,7 @@ import {
 } from '@/lib/actions/product.actions'
 import data from '@/lib/data'
 import { toSlug } from '@/lib/utils'
+import { redirect } from 'next/navigation'
 
 export default async function HomePage() {
   const categories = (await getAllCategories()).slice(0, 4)
@@ -65,7 +66,11 @@ export default async function HomePage() {
       },
     },
   ]
+  const isProduction = process.env.NODE_ENV === 'production'
 
+  if (isProduction) {
+    redirect('/coming-soon')
+  }
   return (
     <>
       <HomeCarousel items={data.carousels} />
@@ -77,17 +82,17 @@ export default async function HomePage() {
           </CardContent>
         </Card>
         <Card className='w-full rounded-none'>
-       <CardContent className='p-4 items-center gap-3'>
-         <ProductSlider
-           title='Best Selling Products'
-           products={bestSellingProducts}
-           hideDetails
-         />
-       </CardContent>
-     </Card>
-     <div className='p-4 bg-background'>
-     <BrowsingHistoryList />
-   </div>
+          <CardContent className='p-4 items-center gap-3'>
+            <ProductSlider
+              title='Best Selling Products'
+              products={bestSellingProducts}
+              hideDetails
+            />
+          </CardContent>
+        </Card>
+        <div className='p-4 bg-background'>
+          <BrowsingHistoryList />
+        </div>
       </div>
     </>
   )

@@ -16,8 +16,8 @@ import { formatDateTime } from '@/lib/utils'
 
 import CheckoutFooter from '../checkout-footer'
 import { redirect, useRouter } from 'next/navigation'
-import { Button } from '@/components/ui/button'
 import ProductPrice from '@/components/shared/product/product-price'
+import { LoadingButton } from '@/components/shared/LoadingButton'
 
 export default function OrderPaymentForm({
   order,
@@ -123,12 +123,13 @@ export default function OrderPaymentForm({
             )}
 
             {!isPaid && paymentMethod === 'Cash On Delivery' && (
-              <Button
+              <LoadingButton
+                loadingText='Loading...'
                 className='w-full rounded-full'
                 onClick={() => router.push(`/account/orders/${order._id}`)}
               >
                 View Order
-              </Button>
+              </LoadingButton>
             )}
           </div>
         </div>

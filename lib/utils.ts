@@ -1,7 +1,6 @@
 import { clsx, type ClassValue } from 'clsx'
 import { twMerge } from 'tailwind-merge'
 import qs from 'query-string'
-
 export function formUrlQuery({
   params,
   key,
@@ -38,7 +37,40 @@ const CURRENCY_FORMATTER = new Intl.NumberFormat('en-US', {
 export function formatCurrency(amount: number) {
   return CURRENCY_FORMATTER.format(amount)
 }
-
+export const getFilterUrl = ({
+  params,
+  category,
+  tag,
+  sort,
+  price,
+  rating,
+  page,
+}: {
+  params: {
+    q?: string
+    category?: string
+    tag?: string
+    price?: string
+    rating?: string
+    sort?: string
+    page?: string
+  }
+  tag?: string
+  category?: string
+  sort?: string
+  price?: string
+  rating?: string
+  page?: string
+}) => {
+  const newParams = { ...params }
+  if (category) newParams.category = category
+  if (tag) newParams.tag = toSlug(tag)
+  if (price) newParams.price = price
+  if (rating) newParams.rating = rating
+  if (page) newParams.page = page
+  if (sort) newParams.sort = sort
+  return `/search?${new URLSearchParams(newParams).toString()}`
+}
 const NUMBER_FORMATTER = new Intl.NumberFormat('en-US')
 export function formatNumber(number: number) {
   return NUMBER_FORMATTER.format(number)

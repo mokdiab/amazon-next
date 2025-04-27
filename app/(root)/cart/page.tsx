@@ -1,7 +1,7 @@
 'use client'
 import BrowsingHistoryList from '@/components/shared/browsing-history-list'
+import { LoadingButton } from '@/components/shared/LoadingButton'
 import ProductPrice from '@/components/shared/product/product-price'
-import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import {
   Select,
@@ -102,12 +102,13 @@ export default function CartPage() {
                               ))}
                             </SelectContent>
                           </Select>
-                          <Button
+                          <LoadingButton
+                            loadingText='Deleting...'
                             variant={'outline'}
                             onClick={() => removeItem(item)}
                           >
                             Delete
-                          </Button>
+                          </LoadingButton>
                         </div>
                       </div>
                       <div>
@@ -173,12 +174,13 @@ export default function CartPage() {
                       <ProductPrice price={itemsPrice} plain />
                     </span>{' '}
                   </div>
-                  <Button
+                  <LoadingButton
+                    loadingText='Proceeding to Checkout...'
                     onClick={() => router.push('/checkout')}
                     className='rounded-full w-full'
                   >
                     Proceed to Checkout
-                  </Button>
+                  </LoadingButton>
                 </CardContent>
               </Card>
             </div>
