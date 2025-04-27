@@ -8,6 +8,7 @@ import {
 } from '@/components/ui/select'
 import { getFilterUrl } from '@/lib/utils'
 import { useRouter } from 'next/navigation'
+import React from 'react'
 
 export default function ProductSortSelector({
   sortOrders,
@@ -26,17 +27,19 @@ export default function ProductSortSelector({
   }
 }) {
   const router = useRouter()
-  const selectedSort = sortOrders.find((s) => s.value === sort) || sortOrders[0]
   return (
     <Select
-      value={selectedSort.value}
       onValueChange={(v) => {
         router.push(getFilterUrl({ params, sort: v }))
       }}
+      value={sort}
     >
       <SelectTrigger>
-        <SelectValue>Sort By: {selectedSort.name}</SelectValue>
+        <SelectValue>
+          Sort By: {sortOrders.find((s) => s.value === sort)!.name}
+        </SelectValue>
       </SelectTrigger>
+
       <SelectContent>
         {sortOrders.map((s) => (
           <SelectItem key={s.value} value={s.value}>
