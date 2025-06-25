@@ -105,6 +105,17 @@
     @apply bg-background text-foreground;
   }
 }
+html,
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
+}
+[dir='rtl'] .grid {
+  direction: rtl;
+}
 
 @layer utilities {
   .flex-between {

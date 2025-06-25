@@ -75,7 +75,6 @@ const NUMBER_FORMATTER = new Intl.NumberFormat('en-US')
 export function formatNumber(number: number) {
   return NUMBER_FORMATTER.format(number)
 }
-// PROMPT: [ChatGTP] create toSlug ts arrow function that convert text to lowercase, remove non-word, non-whitespace, non-hyphen characters, replace whitespace, trim leading hyphens and trim trailing hyphens
 
 export const toSlug = (text: string): string =>
   text
@@ -96,6 +95,23 @@ export const generateId = () => {
   ).join('')
 
   return timestamp + randomDigits
+}
+export function formURLQuery(
+  params: string,
+  key: string,
+  value: string | null
+) {
+  const currentUrl = qs.parse(params)
+
+  currentUrl[key] = value
+
+  return qs.stringifyUrl(
+    {
+      url: window.location.pathname,
+      query: currentUrl,
+    },
+    { skipNull: true }
+  )
 }
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const formatError = (error: any): string => {

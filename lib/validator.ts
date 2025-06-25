@@ -104,13 +104,11 @@ export const CartSchema = z.object({
   shippingAddress: z.optional(ShippingAddressSchema),
 })
 
-// USER
 const UserName = z
   .string()
   .min(2, { message: 'Username must be at least 2 characters' })
   .max(50, { message: 'Username must be at most 30 characters' })
 const Email = z.string().min(1, 'Email is required').email('Email is invalid')
-// Base password requirements (reusable)
 export const BasePasswordSchema = z
   .string()
   .min(8, 'Password must be at least 8 characters')
