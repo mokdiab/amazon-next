@@ -9,6 +9,7 @@ import {
   OrderInputSchema,
   ReviewInputSchema,
   UserNameSchema,
+  ProductUpdateSchema,
 } from '@/lib/validator'
 import { z } from 'zod'
 
@@ -21,6 +22,7 @@ export type IReviewDetails = IReviewInput & {
   }
 }
 export type IProductInput = z.infer<typeof ProductInputSchema>
+export type IProductUpdate = z.infer<typeof ProductUpdateSchema>
 export type Data = {
   products: IProductInput[]
   reviews: {
@@ -50,6 +52,10 @@ export type IOrderList = {
   }
   createdAt: string
   totalPrice: number
+  isPaid: boolean
+  paidAt: Date
+  isDelivered: boolean
+  deliveredAt: Date
 }
 export type OrderItem = z.infer<typeof OrderItemSchema>
 export type Cart = z.infer<typeof CartSchema>

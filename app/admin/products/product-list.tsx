@@ -18,7 +18,8 @@ import {
 } from '@/lib/actions/product.actions'
 import { IProduct } from '@/lib/db/models/product.model'
 import { formatDateTime, formatId } from '@/lib/utils'
-import { ChevronLeft, ChevronRight, Link } from 'lucide-react'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
+import Link from 'next/link'
 import { useEffect, useState, useTransition } from 'react'
 
 type ProductListDataProps = {
@@ -72,30 +73,28 @@ export default function ProductList() {
     <div>
       <div className='space-y-2'>
         <div className='flex-between flex-wrap gap-2'>
-          <div className='flex flex-wrap items-center gap-2 '>
-            <h1 className='font-bold text-lg'>Products</h1>
-            <div className='flex flex-wrap items-center  gap-2 '>
+          <div className='flex flex-wrap items-center gap-2'>
+            <h1>Products</h1>
+            <div className='flex flex-wrap items-center gap-2'>
               <Input
                 className='w-auto'
-                type='text '
+                type='text'
                 value={inputValue}
                 onChange={handleInputChange}
                 placeholder='Filter name...'
               />
-
               {isPending ? (
                 <p>Loading...</p>
               ) : (
                 <p>
                   {data?.totalProducts === 0
                     ? 'No'
-                    : `${data?.from}-${data?.to} of ${data?.totalProducts}`}
+                    : `${data?.from}-${data?.to} of ${data?.totalProducts}`}{' '}
                   {' results'}
                 </p>
               )}
             </div>
           </div>
-
           <Button asChild variant='default'>
             <Link href='/admin/products/create'>Create Product</Link>
           </Button>
@@ -121,7 +120,7 @@ export default function ProductList() {
                   <TableCell>{formatId(product._id)}</TableCell>
                   <TableCell>
                     <Link href={`/admin/products/${product._id}`}>
-                      {product.name}
+                      {product.name.slice(0, 20)}
                     </Link>
                   </TableCell>
                   <TableCell className='text-right'>${product.price}</TableCell>

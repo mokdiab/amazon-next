@@ -39,9 +39,9 @@ export const ProductInputSchema = z.object({
     .number()
     .int()
     .nonnegative('count in stock must be a non-negative number'),
-  tags: z.array(z.string()).default([]),
-  sizes: z.array(z.string()).default([]),
-  colors: z.array(z.string()).default([]),
+  tags: z.array(z.string()),
+  sizes: z.array(z.string()),
+  colors: z.array(z.string()),
   avgRating: z.coerce
     .number()
     .min(0, 'Average rating must be at least 0')
@@ -53,7 +53,7 @@ export const ProductInputSchema = z.object({
   ratingDistribution: z
     .array(z.object({ rating: z.number(), count: z.number() }))
     .max(5),
-  reviews: z.array(ReviewInputSchema).default([]),
+  reviews: z.array(ReviewInputSchema),
   numSales: z.coerce
     .number()
     .int()
@@ -217,4 +217,7 @@ export const OrderInputSchema = z.object({
   deliveredAt: z.date().optional(),
   isPaid: z.boolean().default(false),
   paidAt: z.date().optional(),
+})
+export const ProductUpdateSchema = ProductInputSchema.extend({
+  _id: z.string(),
 })

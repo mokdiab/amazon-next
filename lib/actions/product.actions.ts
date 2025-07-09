@@ -5,6 +5,9 @@ import Product, { IProduct } from '@/lib/db/models/product.model'
 import { PAGE_SIZE } from '../constants'
 import { formatError } from '../utils'
 import { revalidatePath } from 'next/cache'
+import { ProductInputSchema, ProductUpdateSchema } from '../validator'
+import z from 'zod'
+import { IProductInput } from '@/types'
 export async function deleteProduct(id: string) {
   try {
     await connectToDatabase()
@@ -12,6 +15,20 @@ export async function deleteProduct(id: string) {
     if (!res) throw new Error('Product not found')
     revalidatePath('/admin/products')
     return { success: true, message: 'Product deleted successfully' }
+  } catch (error) {
+    return { success: false, message: formatError(error) }
+  }
+}
+export async function createProduct(data: IProductInput) {
+  try {
+    const product = ProductInputSchema.parse(data)
+    await connectToDatabase()
+    await Product.create(product)
+    revalidatePath('/admin/products')
+    return {
+      success: true,
+      message: 'Product created successfully',
+    }
   } catch (error) {
     return { success: false, message: formatError(error) }
   }
@@ -64,6 +81,20 @@ export async function getAllProductsForAdmin({
     totalProducts: countProducts,
     from: pageSize * (Number(page) - 1) + 1,
     to: pageSize * (Number(page) - 1) + products.length,
+  }
+}
+export async function updateProduct(data: z.infer<typeof ProductUpdateSchema>) {
+  try {
+    const product = ProductUpdateSchema.parse(data)
+    await connectToDatabase()
+    await Product.findByIdAndUpdate(product._id, product)
+    revalidatePath('/admin/products')
+    return {
+      success: true,
+      message: 'Product updated successfully',
+    }
+  } catch (error) {
+    return { success: false, message: formatError(error) }
   }
 }
 export async function getAllProducts({
@@ -148,6 +179,7 @@ export async function getAllProducts({
     to: limit * (Number(page) - 1) + products.length,
   }
 }
+
 export async function getAllTags() {
   const tags = await Product.aggregate([
     { $unwind: '$tags' },
@@ -196,6 +228,7 @@ export async function getProductsForCard({
     image: string
   }[]
 }
+
 export async function getProductsByTag({
   tag,
   limit = 10,
@@ -217,6 +250,11 @@ export async function getProductBySlug(slug: string) {
   await connectToDatabase()
   const product = await Product.findOne({ slug, isPublished: true })
   if (!product) throw new Error('Product not found')
+  return JSON.parse(JSON.stringify(product)) as IProduct
+}
+export async function getProductById(productId: string) {
+  await connectToDatabase()
+  const product = await Product.findById(productId)
   return JSON.parse(JSON.stringify(product)) as IProduct
 }
 // GET RELATED PRODUCTS: PRODUCTS WITH SAME CATEGORY
