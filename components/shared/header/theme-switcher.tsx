@@ -15,19 +15,42 @@ import {
 
 import useColorStore from '@/hooks/use-color-store'
 import useIsMounted from '@/hooks/use-is-mounted'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 
 export default function ThemeSwitcher() {
   const { theme, systemTheme, setTheme } = useTheme()
-  const { availableColors, color, setColor } = useColorStore(theme)
   const isMounted = useIsMounted()
 
-  // Update color when theme changes
+  const [detectedSystemTheme, setDetectedSystemTheme] = useState<string>()
+
+  const actualSystemTheme = detectedSystemTheme || systemTheme
+
+  const resolvedTheme = theme === 'system' ? actualSystemTheme : theme
+
+  const { availableColors, color, setColor, updateCssVariables } =
+    useColorStore(resolvedTheme || 'light')
+
   useEffect(() => {
-    if (isMounted) {
-      setColor(color.name, false) // Update color without changing the theme
+    if (!isMounted) return
+
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
+
+    setDetectedSystemTheme(mediaQuery.matches ? 'dark' : 'light')
+
+    const handleChange = (e: MediaQueryListEvent) => {
+      setDetectedSystemTheme(e.matches ? 'dark' : 'light')
     }
-  }, [theme, isMounted])
+
+    mediaQuery.addEventListener('change', handleChange)
+
+    return () => mediaQuery.removeEventListener('change', handleChange)
+  }, [isMounted])
+
+  useEffect(() => {
+    if (isMounted && resolvedTheme) {
+      updateCssVariables(resolvedTheme)
+    }
+  }, [resolvedTheme, color, isMounted, updateCssVariables])
 
   const changeTheme = (value: string) => {
     setTheme(value)
@@ -37,7 +60,7 @@ export default function ThemeSwitcher() {
     if (!isMounted) return <Monitor className='h-4 w-4' />
 
     if (theme === 'system') {
-      return systemTheme === 'dark' ? (
+      return actualSystemTheme === 'dark' ? (
         <Moon className='h-4 w-4' />
       ) : (
         <Sun className='h-4 w-4' />
@@ -54,7 +77,7 @@ export default function ThemeSwitcher() {
     if (!isMounted) return 'System'
 
     if (theme === 'system') {
-      return `System (${systemTheme})`
+      return `System (${actualSystemTheme})`
     }
     return theme === 'dark' ? 'Dark' : 'Light'
   }
@@ -90,7 +113,9 @@ export default function ThemeSwitcher() {
           {availableColors.map((c) => (
             <DropdownMenuRadioItem key={c.name} value={c.name}>
               <div
-                style={{ backgroundColor: `hsl(${c.root['--primary']})` }}
+                style={{
+                  backgroundColor: `hsl(${resolvedTheme === 'dark' ? c.dark['--primary'] : c.root['--primary']})`,
+                }}
                 className='h-4 w-4 mr-1 rounded-full border border-foreground/20'
               />
               <span className='capitalize'>{c.name}</span>

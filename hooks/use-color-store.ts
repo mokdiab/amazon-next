@@ -10,6 +10,7 @@ type ColorState = {
   defaultColor: string
   userColor?: string
 }
+
 const availableColors = [
   {
     name: 'Gold',
@@ -180,6 +181,7 @@ const availableColors = [
     },
   },
 ]
+
 const initialState: ColorState = {
   availableColors,
   defaultColor: availableColors[0].name,
@@ -223,10 +225,11 @@ export default function useColorStore(theme: string = 'light') {
         isUserColor ? { userColor: name } : { defaultColor: name }
       )
     },
-    updateCssVariables: () => {
+    updateCssVariables: (currentTheme?: string) => {
       const currentColor = getColor()
+      const activeTheme = currentTheme || theme
       const colors: { [key: string]: string } =
-        theme === 'dark' ? currentColor.dark : currentColor.root
+        activeTheme === 'dark' ? currentColor.dark : currentColor.root
 
       for (const key in colors) {
         const value = colors[key]
