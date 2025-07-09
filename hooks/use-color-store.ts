@@ -185,6 +185,7 @@ const initialState: ColorState = {
   defaultColor: availableColors[0].name,
   userColor: undefined,
 }
+
 export const colorStore = create<ColorState>()(
   persist(() => initialState, {
     name: 'colorStore',
@@ -193,11 +194,13 @@ export const colorStore = create<ColorState>()(
 
 export default function useColorStore(theme: string = 'light') {
   const colorState = colorStore()
+
   const getColor = () => {
     const userColor = colorState.availableColors.find(
       (t) => t.name === colorState.userColor
     )
     if (userColor) return userColor
+
     const defaultColor = colorState.availableColors.find(
       (t) => t.name === colorState.defaultColor
     )
@@ -208,9 +211,10 @@ export default function useColorStore(theme: string = 'light') {
 
   const color = getColor()
   const cssColors: { [key: string]: string } =
-    theme === 'light' ? color.root : color.dark
+    theme === 'dark' ? color.dark : color.root
+
   return {
-    availableColors,
+    availableColors: colorState.availableColors,
     cssColors,
     color,
     getColor,
@@ -220,9 +224,10 @@ export default function useColorStore(theme: string = 'light') {
       )
     },
     updateCssVariables: () => {
-      const color = getColor()
+      const currentColor = getColor()
       const colors: { [key: string]: string } =
-        theme === 'light' ? color.root : color.dark
+        theme === 'dark' ? currentColor.dark : currentColor.root
+
       for (const key in colors) {
         const value = colors[key]
         const formattedValue =
