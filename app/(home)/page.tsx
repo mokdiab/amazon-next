@@ -10,7 +10,6 @@ import {
 } from '@/lib/actions/product.actions'
 import data from '@/lib/data'
 import { toSlug } from '@/lib/utils'
-import { redirect } from 'next/navigation'
 
 export default async function HomePage() {
   const categories = (await getAllCategories()).slice(0, 4)
@@ -66,11 +65,7 @@ export default async function HomePage() {
       },
     },
   ]
-  const isProduction = process.env.NODE_ENV === 'production'
 
-  if (isProduction) {
-    redirect('/coming-soon')
-  }
   return (
     <>
       <HomeCarousel items={data.carousels} />
