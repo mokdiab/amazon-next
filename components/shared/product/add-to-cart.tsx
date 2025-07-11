@@ -2,6 +2,7 @@
 
 import { Button } from '@/components/ui/button'
 import { LoadingButton } from '@/components/shared/LoadingButton'
+import { useTranslations } from 'next-intl'
 import {
   Select,
   SelectContent,
@@ -25,20 +26,21 @@ export default function AddToCart({
   const router = useRouter()
   const { addItem } = useCartStore()
   const [quantity, setQuantity] = useState(1)
+  const t = useTranslations()
   return minimal ? (
     <LoadingButton
       className='rounded-full w-auto'
       onClick={async () => {
         try {
           await addItem(item, 1)
-          toast.success(`${item.name} added to cart`, {
+          toast.success(`${item.name} ${t('Product.Added to Cart')}`, {
             action: (
               <Button
                 onClick={() => {
                   router.push('/cart')
                 }}
               >
-                Go to Cart
+                {t('Product.Go to Cart')}
               </Button>
             ),
           })
@@ -50,7 +52,7 @@ export default function AddToCart({
       }}
       loadingText='Adding...'
     >
-      Add to Cart
+      {t('Product.Add to Cart')}
     </LoadingButton>
   ) : (
     <div className='w-full space-y-2'>
@@ -84,7 +86,7 @@ export default function AddToCart({
         }}
         loadingText='Adding...'
       >
-        Add to Cart
+        {t('Product.Add to Cart')}
       </LoadingButton>
       <LoadingButton
         variant='secondary'
@@ -101,7 +103,7 @@ export default function AddToCart({
         className='w-full rounded-full '
         loadingText='Redirecting...'
       >
-        Buy Now
+        {t('Product.Buy Now')}
       </LoadingButton>
     </div>
   )

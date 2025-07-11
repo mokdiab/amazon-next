@@ -1,34 +1,44 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import data from '@/lib/data'
 import { connectToDatabase } from '.'
+import User from './models/user.model'
 import Product from './models/product.model'
+import Review from './models/review.model'
 import { cwd } from 'process'
 import { loadEnvConfig } from '@next/env'
-import User from './models/user.model'
-import Review from './models/review.model'
 import Order from './models/order.model'
-import { IOrderInput, OrderItem, ShippingAddress } from '@/types'
 import {
   calculateFutureDate,
   calculatePastDate,
   generateId,
   round2,
 } from '../utils'
-import { AVAILABLE_DELIVERY_DATES } from '../constants'
+import WebPage from './models/web-page.model'
+import Setting from './models/setting.model'
+import { OrderItem, IOrderInput, ShippingAddress } from '@/types'
 
 loadEnvConfig(cwd())
 
 const main = async () => {
   try {
-    const { products, users, reviews } = data
+    const { users, products, reviews, webPages, settings } = data
     await connectToDatabase(process.env.MONGODB_URI)
 
-    await Product.deleteMany()
     await User.deleteMany()
-    await Review.deleteMany()
-    await Order.deleteMany()
     const createdUser = await User.insertMany(users)
-    const createdProducts = await Product.insertMany(products)
+
+    await Setting.deleteMany()
+    const createdSetting = await Setting.insertMany(settings)
+
+    await WebPage.deleteMany()
+    await WebPage.insertMany(webPages)
+
+    await Product.deleteMany()
+    const createdProducts = await Product.insertMany(
+      products.map((x) => ({ ...x, _id: undefined }))
+    )
+
+    await Review.deleteMany()
     const rws = []
     for (let i = 0; i < createdProducts.length; i++) {
       let x = 0
@@ -50,6 +60,8 @@ const main = async () => {
       }
     }
     const createdReviews = await Review.insertMany(rws)
+
+    await Order.deleteMany()
     const orders = []
     for (let i = 0; i < 200; i++) {
       orders.push(
@@ -62,10 +74,11 @@ const main = async () => {
     }
     const createdOrders = await Order.insertMany(orders)
     console.log({
-      createdProducts,
       createdUser,
+      createdProducts,
       createdReviews,
       createdOrders,
+      createdSetting,
       message: 'Seeded database successfully',
     })
     process.exit(0)
@@ -74,12 +87,14 @@ const main = async () => {
     throw new Error('Failed to seed database')
   }
 }
+
 const generateOrder = async (
   i: number,
   users: any,
   products: any
 ): Promise<IOrderInput> => {
   const product1 = await Product.findById(products[i % products.length])
+
   const product2 = await Product.findById(
     products[
       i % products.length >= products.length - 1
@@ -94,9 +109,9 @@ const generateOrder = async (
         : (i % products.length) + 2
     ]
   )
-  if (!product1 || !product2 || !product3) {
-    throw new Error('Product not found')
-  }
+
+  if (!product1 || !product2 || !product3) throw new Error('Product not found')
+
   const items = [
     {
       clientId: generateId(),
@@ -114,29 +129,30 @@ const generateOrder = async (
       product: product2._id,
       name: product2.name,
       slug: product2.slug,
-      quantity: 1,
+      quantity: 2,
       image: product2.images[0],
-      category: product2.category,
+      category: product1.category,
       price: product2.price,
-      countInStock: product2.countInStock,
+      countInStock: product1.countInStock,
     },
     {
       clientId: generateId(),
       product: product3._id,
       name: product3.name,
       slug: product3.slug,
-      quantity: 1,
+      quantity: 3,
       image: product3.images[0],
-      category: product3.category,
+      category: product1.category,
       price: product3.price,
-      countInStock: product3.countInStock,
+      countInStock: product1.countInStock,
     },
   ]
+
   const order = {
     user: users[i % users.length],
-    items: items.map((x) => ({
-      ...x,
-      product: x.product,
+    items: items.map((item) => ({
+      ...item,
+      product: item.product,
     })),
     shippingAddress: data.users[i % users.length].address,
     paymentMethod: data.users[i % users.length].paymentMethod,
@@ -146,7 +162,6 @@ const generateOrder = async (
     deliveredAt: calculatePastDate(i),
     createdAt: calculatePastDate(i),
     expectedDeliveryDate: calculateFutureDate(i % 2),
-    expectedDeliveryAt: calculateFutureDate(i % 2),
     ...calcDeliveryDateAndPriceForSeed({
       items: items,
       shippingAddress: data.users[i % users.length].address,
@@ -155,24 +170,29 @@ const generateOrder = async (
   }
   return order
 }
+
 export const calcDeliveryDateAndPriceForSeed = ({
   items,
   deliveryDateIndex,
 }: {
+  deliveryDateIndex?: number
   items: OrderItem[]
-  deliveryDateIndex: number
   shippingAddress?: ShippingAddress
 }) => {
+  const { availableDeliveryDates } = data.settings[0]
   const itemsPrice = round2(
     items.reduce((acc, item) => acc + item.price * item.quantity, 0)
   )
+
   const deliveryDate =
-    AVAILABLE_DELIVERY_DATES[
+    availableDeliveryDates[
       deliveryDateIndex === undefined
-        ? AVAILABLE_DELIVERY_DATES.length - 1
+        ? availableDeliveryDates.length - 1
         : deliveryDateIndex
     ]
+
   const shippingPrice = deliveryDate.shippingPrice
+
   const taxPrice = round2(itemsPrice * 0.15)
   const totalPrice = round2(
     itemsPrice +
@@ -180,10 +200,10 @@ export const calcDeliveryDateAndPriceForSeed = ({
       (taxPrice ? round2(taxPrice) : 0)
   )
   return {
-    AVAILABLE_DELIVERY_DATES,
+    availableDeliveryDates,
     deliveryDateIndex:
       deliveryDateIndex === undefined
-        ? AVAILABLE_DELIVERY_DATES.length - 1
+        ? availableDeliveryDates.length - 1
         : deliveryDateIndex,
     itemsPrice,
     shippingPrice,
@@ -191,4 +211,5 @@ export const calcDeliveryDateAndPriceForSeed = ({
     totalPrice,
   }
 }
+
 main()

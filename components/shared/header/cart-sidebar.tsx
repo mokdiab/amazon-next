@@ -2,13 +2,10 @@ import useCartStore from '@/hooks/use-cart-store'
 import { cn } from '@/lib/utils'
 import Link from 'next/link'
 import React from 'react'
-import Image from 'next/image'
-import { TrashIcon } from 'lucide-react'
-import { FREE_SHIPPING_MIN_PRICE } from '@/lib/constants'
-import ProductPrice from '../product/product-price'
 import { Button, buttonVariants } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
 import { ScrollArea } from '@/components/ui/scroll-area'
+import Image from 'next/image'
 import {
   Select,
   SelectContent,
@@ -16,6 +13,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { TrashIcon } from 'lucide-react'
+import useSettingStore from '@/hooks/use-setting-store'
+import { useLocale, useTranslations } from 'next-intl'
+import { getDirection } from '@/i18n-config'
+import ProductPrice from '../product/product-price'
 
 export default function CartSidebar() {
   const {
@@ -23,19 +25,31 @@ export default function CartSidebar() {
     updateItem,
     removeItem,
   } = useCartStore()
+  const {
+    setting: {
+      common: { freeShippingMinPrice },
+    },
+  } = useSettingStore()
 
+  const t = useTranslations()
+
+  const locale = useLocale()
   return (
-    <div className='w-36 overflow-y-auto'>
-      <div className={`fixed border-l h-full`}>
-        <div className='p-2 h-full flex flex-col gap-2 justify-start items-center'>
+    <div className='w-32 overflow-y-auto'>
+      <div
+        className={`w-32 fixed  h-full ${
+          getDirection(locale) === 'rtl' ? 'border-r' : 'border-l'
+        }`}
+      >
+        <div className='p-2 h-full flex flex-col gap-2 justify-center items-center'>
           <div className='text-center space-y-2'>
-            <div> Subtotal</div>
-            <div className='font-bold'>
+            <div> {t('Cart.Subtotal')}</div>
+            <div className='font-bold '>
               <ProductPrice price={itemsPrice} plain />
             </div>
-            {itemsPrice > FREE_SHIPPING_MIN_PRICE && (
+            {itemsPrice > freeShippingMinPrice && (
               <div className=' text-center text-xs'>
-                Your order qualifies for FREE Shipping
+                {t('Cart.Your order qualifies for FREE Shipping')}
               </div>
             )}
 
@@ -46,12 +60,12 @@ export default function CartSidebar() {
               )}
               href='/cart'
             >
-              Go to Cart
+              {t('Cart.Go to Cart')}
             </Link>
             <Separator className='mt-3' />
           </div>
 
-          <ScrollArea className='flex-1 w-full h-72'>
+          <ScrollArea className='flex-1  w-full'>
             {items.map((item) => (
               <div key={item.clientId}>
                 <div className='my-3'>
@@ -76,10 +90,7 @@ export default function CartSidebar() {
                         updateItem(item, Number(value))
                       }}
                     >
-                      <SelectTrigger
-                        size='sm'
-                        className='text-xs w-auto ml-1 h-auto py-0'
-                      >
+                      <SelectTrigger className='text-xs w-12 ml-1 h-auto py-0'>
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>

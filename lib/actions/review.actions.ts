@@ -12,7 +12,7 @@ import Review, { IReview } from '../db/models/review.model'
 import { formatError } from '../utils'
 import { ReviewInputSchema } from '../validator'
 import { IReviewDetails } from '@/types'
-import { PAGE_SIZE } from '../constants'
+import { getSetting } from './setting.actions'
 
 export async function createUpdateReview({
   data,
@@ -111,7 +111,10 @@ export async function getReviews({
   limit?: number
   page: number
 }) {
-  limit = limit || PAGE_SIZE
+  const {
+    common: { pageSize },
+  } = await getSetting()
+  limit = limit || pageSize
   await connectToDatabase()
   const skipAmount = (page - 1) * limit
   const reviews = await Review.find({ product: productId })
@@ -121,7 +124,6 @@ export async function getReviews({
     })
     .skip(skipAmount)
     .limit(limit)
-  console.log(reviews)
   const reviewsCount = await Review.countDocuments({ product: productId })
   return {
     data: JSON.parse(JSON.stringify(reviews)) as IReviewDetails[],
@@ -143,50 +145,4 @@ export const getReviewByProductId = async ({
     user: session?.user?.id,
   })
   return review ? (JSON.parse(JSON.stringify(review)) as IReview) : null
-}
-
-export async function deleteReview({
-  productId,
-  path,
-}: {
-  productId: string
-  path: string
-}) {
-  try {
-    const session = await auth()
-    if (!session) {
-      throw new Error('User is not authenticated')
-    }
-
-    await connectToDatabase()
-
-    // Delete the review
-    const deletedReview = await Review.findOneAndDelete({
-      product: productId,
-      user: session.user.id,
-    })
-
-    if (!deletedReview) {
-      return {
-        success: false,
-        message: 'Review not found or already deleted',
-      }
-    }
-
-    // Recalculate product review stats
-    await updateProductReview(productId)
-
-    // Revalidate the path to update the UI
-    revalidatePath(path)
-
-    return {
-      success: true,
-      message: 'Review deleted successfully',
-    }
-  } catch (error) {
-    return {
-      success: false,
-      message: formatError(error),
-    }
-  }
 }

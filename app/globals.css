@@ -137,6 +137,9 @@ body {
   .item-button {
     @apply p-3 hover:bg-muted hover:no-underline;
   }
+  .web-page-content p {
+    @apply py-2;
+  }
 }
 @keyframes shimmer {
   0% {
